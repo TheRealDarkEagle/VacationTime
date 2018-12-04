@@ -22,6 +22,10 @@ import java.util.GregorianCalendar;
  * Feiertag		tag 	monat	jahr	wochentag 	
  * aussehen (brückentage):
  * Feiertag 	von		bis 	start wochentag 	ende wochentag 	freie Tage
+ * Überarbeitung der Ausgabemethode -> brauche ich diese eigentlich noch in der Konsole? 
+ * einfügen der manuellen eingabe (benutzer) von jahr und welches bundesland (option auf alle anzeigen -> 
+ * nicht aussortieren(if lookAll -> iteriere über liste und gebe aus)
+ * 
  * @author danzk
  *
  */
@@ -32,6 +36,7 @@ public class Holidays {
 	 * @throws IOException 
 	 */
 	public void calendar(int year) throws IOException {
+		
 		ArrayList<GregorianCalendar> allHoliDays = new ArrayList<GregorianCalendar>();
 		//Liste mit Feiertagen, welche von Ostern abgeleitet werden 
 		allHoliDays = holidaysFromEastern(year);
@@ -45,7 +50,14 @@ public class Holidays {
 		bridgingDays = deleteDoubleDays(bridgingDays,allHoliDays);
 		//ausgabe der feiertage und potentiellen brückentagen des eingegebenen Jahres
 		outputHoliDays(bridgingDays,allHoliDays,year);
+		ArrayList<Holiday>completeHoliday = allDataForHolidays(allHoliDays);
+		for(Holiday all:completeHoliday) {
+			if(all.stateOF.contains("Rheinland-Pfalz")) {
+			System.out.println(all.stateOF);
+			}
+		}
 		writeIntoFile(bridgingDays,allHoliDays);
+				
 	}
 	
 	//Berechnung der von Ostern abhängigen Feiertagen (Ostern als Basis)
@@ -173,14 +185,24 @@ public class Holidays {
 		}
 	}
 	
+	/**
+	 * @TODO: 
+	 * schreiben in datei überarbeiten : 
+	 *  aussehen(feiertage): 
+	 * Feiertag		tag 	monat	jahr	wochentag 	
+	 * aussehen (brückentage):
+	 * Feiertag 	von		bis 	start wochentag 	ende wochentag 	freie Tage
+	 * @param bridgingDays
+	 * @param allHoliDays
+	 * @throws IOException
+	 */
 	//Schreibt die Datumsangaben in eine externe CSV File
 	private void writeIntoFile(ArrayList<GregorianCalendar> bridgingDays, ArrayList<GregorianCalendar> allHoliDays) throws IOException {
-		String[] nameOfHoliDay = {"Neujahr","Heilige Drei Koenige","Karfreitag","Ostersonntag","Ostermontag","Tag der Arbeit","Christ Himmelfahr","Pfingstsonntag",
-				"PFingsmontag","Fronleichnam","Augsburger FriedensFest","Mariä Himmelfahrt","Tag der Deutschen Einheit","Reformationstag","Allerheiligen",
-				"Buß- und Bettag","1.Weichnachtag","2.Weihnachtstag"};
 		String verzeichnisDestop = System.getProperty("user.home");
 		Path pfadMitDatei = Paths.get(verzeichnisDestop, "try.csv");
 			try(BufferedWriter writePuffer = Files.newBufferedWriter(pfadMitDatei)){
+				writePuffer.write("gesetzliche Feiertage");
+				writePuffer.newLine();
 				writePuffer.write("Feiertag;Tag;Monat;Jahr;Wochentag");
 				writePuffer.newLine();
 				for(GregorianCalendar holiDay: allHoliDays) {
@@ -191,14 +213,16 @@ public class Holidays {
 					String zeile = String.format("%s;%d;%s;%d%n", weekDay,day,month,year);
 					writePuffer.write(zeile);
 				}
-				writePuffer.write("Brueckentage;Tag;Monat;Jahr");
+				writePuffer.write("Potentielle Brueckentage");
+				writePuffer.newLine();
+				writePuffer.write(";Tag;Monat;Jahr;Wochentag");
 				writePuffer.newLine();
 				for(GregorianCalendar bridgeDay: bridgingDays) {
 					String weekDay1 = whichDay(bridgeDay);
 					int day = bridgeDay.get(Calendar.DAY_OF_MONTH);
 					String month = whichMonth(bridgeDay);
 					int year = bridgeDay.get(Calendar.YEAR);
-					String zeile = String.format("%s;%d;%s;%d%n", weekDay1,day,month,year);
+					String zeile = String.format("%s;%d;%s;%d,%s%n", " ",day,month,year,weekDay1);
 					writePuffer.write(zeile);
 				}
 			}
@@ -277,5 +301,30 @@ public class Holidays {
 			break;
 		}
 		return month;
+	}
+
+	private String allStatesOfGermany() {
+		return "Baden-Württemberg,Bayern,Berlin,Brandenburg,Bremen,Hamburg,Hessen,Mecklenburg-Vorpommern,Niedersachsen,Nordrhein-Westfalen,Rheinland-Pfalz,Saarland"
+				+ ",Sachsen,Sachsen-Anhalt,Schleswig-Holstein,Thüringen";
+	}
+	//Gibt eine Liste mit Holiday Elementen wieder (Diese beinhalten: GregorianCalendar, Name sowie die Bundesländer in denen sie vorkommen)
+	private ArrayList<Holiday> allDataForHolidays(ArrayList<GregorianCalendar>allHolidays){
+		int counter =0;
+		String[] nameOfHoliDay = {"Neujahr","Heilige Drei Koenige","Karfreitag","Ostersonntag","Ostermontag","Tag der Arbeit","Christ Himmelfahr","Pfingstsonntag",
+				"PFingsmontag","Fronleichnam","Augsburger FriedensFest","Mariä Himmelfahrt","Tag der Deutschen Einheit","Reformationstag","Allerheiligen",
+				"Buß- und Bettag","1.Weichnachtag","2.Weihnachtstag"};
+		String[] statesForHolidaysInGermany = {allStatesOfGermany(),"Baden-Württemberg,Bayern, Sachsen-Anhalt",allStatesOfGermany(),"Brandenburg",allStatesOfGermany(),
+				allStatesOfGermany(),allStatesOfGermany(),"Brandenburg",allStatesOfGermany(),"Baden-Württemberg, Bayern, Hessen, Nordrhein-Westfalen,Rheinland-Pfalz, Saarland",
+				"Bayern","Bayern, Saarland",allStatesOfGermany(),"Brandenburg, Mecklenburg-Vorpomern, Sachsen, Sachsen-Anhalt, Thüringen, Bremen, Hamburg, Schleswig-Holstein, Niedersachsen",
+				"Baden-Württemberg, Bayern, Nordrhein-Westfalen, Rheinland-Pfalz, Saarland", "Sachsen", allStatesOfGermany(),allStatesOfGermany()};
+		//Da beide Array gleich lang sind, nehme ich einen Counter um beide an der selben Stelle anzusprechen
+		
+		ArrayList<Holiday> bla = new ArrayList<Holiday>();
+		//gehe liste mit allen holidays durch und speichere dir das objekt mit den weiteren parametern in liste<Holiday> ab
+		for(GregorianCalendar holiday : allHolidays) {
+			bla.add(new Holiday(holiday, nameOfHoliDay[counter],statesForHolidaysInGermany[counter]));
+			counter++;
+		}
+		return bla;
 	}
 }
