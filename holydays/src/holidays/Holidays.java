@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -15,21 +14,25 @@ import java.util.GregorianCalendar;
 
 /**
  * @TODO:
- * Namen der Feiertage mit ausgeben 
  * ausgabe der feiertage anhand bundesländer
  * zeitraum des urlaubs durch brückentage
- * aussehen(feiertage): 
- * Feiertag		tag 	monat	jahr	wochentag 	
  * aussehen (brückentage):
  * Feiertag 	von		bis 	start wochentag 	ende wochentag 	freie Tage
- * Überarbeitung der Ausgabemethode -> brauche ich diese eigentlich noch in der Konsole? 
- * einfügen der manuellen eingabe (benutzer) von jahr und welches bundesland (option auf alle anzeigen -> 
- * nicht aussortieren(if lookAll -> iteriere über liste und gebe aus)
+ * nicht aussortieren wenn allStates true
  * 
  * @author danzk
  *
  */
 public class Holidays {
+	
+	boolean allStates;
+	String yourState;
+	
+	//Konstruktor
+	public Holidays(boolean allStates, String yourState) {
+		this.allStates = allStates;
+		this.yourState = yourState;
+	}
 	
 	/**
 	 * Einstiegspunkt 
@@ -44,19 +47,15 @@ public class Holidays {
 		allHoliDays.addAll(setSolidHoliDays(year));
 		//Sortierung der Liste mit ALLEN Feiertagen
 		Collections.sort(allHoliDays);
-		//Herausfinden der Feiertage anhand allen Feiertagen 
-		ArrayList<GregorianCalendar>bridgingDays = bridgingDay(allHoliDays);
-		//Überarbeitung der Brückentagsliste anhand schon vorhanden einträgen (ausgehend von feiertagsliste)
-		bridgingDays = deleteDoubleDays(bridgingDays,allHoliDays);
-		//ausgabe der feiertage und potentiellen brückentagen des eingegebenen Jahres
-		outputHoliDays(bridgingDays,allHoliDays,year);
+		
 		ArrayList<Holiday>completeHoliday = allDataForHolidays(allHoliDays);
-		for(Holiday all:completeHoliday) {
-			if(all.stateOF.contains("Rheinland-Pfalz")) {
-			System.out.println(all.stateOF);
-			}
-		}
-		writeIntoFile(bridgingDays,allHoliDays);
+		//Herausfinden der Feiertage anhand allen Feiertagen 
+		ArrayList<GregorianCalendar>bridgingDays = bridgingDay(completeHoliday);
+		//Überarbeitung der Brückentagsliste anhand schon vorhanden einträgen (ausgehend von feiertagsliste)
+		bridgingDays = deleteDoubleDays(bridgingDays,completeHoliday);
+		//ausgabe der feiertage und potentiellen brückentagen des eingegebenen Jahres - OBSOLET!
+//		outputHoliDays(bridgingDays,completeHoliday,year);
+		writeIntoFile(bridgingDays,completeHoliday);
 				
 	}
 	
@@ -103,8 +102,8 @@ public class Holidays {
 	//Erstellung einer Liste mit allen Festen Feiertagen -> Datumsangaben werden durch 2 int[] eingefügt
 	private ArrayList<GregorianCalendar> setSolidHoliDays(int year){
 		ArrayList<GregorianCalendar> solidHoliDay = new ArrayList<GregorianCalendar>();
-		int[] month = 	{0,0,4,7,7,10,10,11,11,12,12};
-		int[] day = 	{1,6,1,8,10,03,31,01,21,25,26};
+		int[] month = 	{0,0,4,7,7,9,9,10,10,11,11};
+		int[] day = 	{1,6,1,8,15,03,31,01,20,25,26};
 		for(int i=0;i<month.length;i++) {
 			solidHoliDay.add(new GregorianCalendar(year,month[i],day[i]));
 		}
@@ -112,30 +111,24 @@ public class Holidays {
 	}
 	
 	//Speicherung der Tage, welche maßgebend sind für Brückentage (Montag/Dienstag/Donnerstag/Freitag), in bridgeDay Liste 
-	private ArrayList<GregorianCalendar> bridgingDay(ArrayList<GregorianCalendar> holiDays) {
+	private ArrayList<GregorianCalendar> bridgingDay(ArrayList<Holiday> holiDays) {
 		ArrayList<GregorianCalendar> bridgeDay = new ArrayList<GregorianCalendar>();
 		//Geht die Liste holiDays durch und speichert bei montag/Freitag den kommenden/vorherigen Tag in neuer liste ab
-		for(GregorianCalendar holiDay : holiDays) {
+		for(Holiday holiDay : holiDays) {
 			//Sonntag = 1 -> Samstag = 7
-			int holiDayDay = holiDay.get(Calendar.DAY_OF_WEEK);
+			int holiDayDay = holiDay.cal.get(Calendar.DAY_OF_WEEK);
 			if(holiDayDay<7 && holiDayDay>1) {
 				//Speicherung der Datumsangabe in bridgeDay Liste anhand von Tag des Feiertages 
 				switch(holiDayDay) {
-				//Montag
+				//Montag und Donnerstag
 				case 2:
-					bridgeDay.add(new GregorianCalendar(holiDay.get(Calendar.YEAR), holiDay.get(Calendar.MONTH), holiDay.get(Calendar.DAY_OF_MONTH)+1));
-					break;
-				//Dienstag
-				case 3:
-					bridgeDay.add(new GregorianCalendar(holiDay.get(Calendar.YEAR), holiDay.get(Calendar.MONTH), holiDay.get(Calendar.DAY_OF_MONTH)-1));
-					break;
-				//Donnerstag
 				case 5:
-					bridgeDay.add(new GregorianCalendar(holiDay.get(Calendar.YEAR), holiDay.get(Calendar.MONTH), holiDay.get(Calendar.DAY_OF_MONTH)+1));
+					bridgeDay.add(new GregorianCalendar(holiDay.cal.get(Calendar.YEAR), holiDay.cal.get(Calendar.MONTH), holiDay.cal.get(Calendar.DAY_OF_MONTH)+1));
 					break;
-				//Freitag
+				//Dienstag und Freitag
+				case 3:
 				case 6:
-					bridgeDay.add(new GregorianCalendar(holiDay.get(Calendar.YEAR), holiDay.get(Calendar.MONTH), holiDay.get(Calendar.DAY_OF_MONTH)-1));
+					bridgeDay.add(new GregorianCalendar(holiDay.cal.get(Calendar.YEAR), holiDay.cal.get(Calendar.MONTH), holiDay.cal.get(Calendar.DAY_OF_MONTH)-1));
 					break;
 				}
 			}
@@ -144,16 +137,16 @@ public class Holidays {
 	}
 	
 	//Durchsuchen der Listen nach schon vorhandenen Einträgen -> Erstellung überarbeiter bridgingDays Liste  
-	private ArrayList<GregorianCalendar> deleteDoubleDays(ArrayList<GregorianCalendar> bridgingDays,ArrayList<GregorianCalendar> allHoliDays) {
+	private ArrayList<GregorianCalendar> deleteDoubleDays(ArrayList<GregorianCalendar> bridgingDays,ArrayList<Holiday> allHoliDays) {
 		ArrayList<GregorianCalendar> reworkedBridgingDays = new ArrayList<GregorianCalendar>();
 		//Nehme datumsangabe aus brückentag-Liste (monat & tag) vergleiche mit datumsangaben aus feiertagsliste (monat & tag)
 		for(GregorianCalendar bridgeDay:bridgingDays) {
 			boolean dayExist = false;
 			int bridgeDayMonth = bridgeDay.get(Calendar.MONTH);
 			int bridgeDayDay = bridgeDay.get(Calendar.DAY_OF_MONTH);
-			for(GregorianCalendar holiDay:allHoliDays) {
-				int holiDayMonth = holiDay.get(Calendar.MONTH);
-				int holiDayDay = holiDay.get(Calendar.DAY_OF_MONTH);
+			for(Holiday holiDay:allHoliDays) {
+				int holiDayMonth = holiDay.cal.get(Calendar.MONTH);
+				int holiDayDay = holiDay.cal.get(Calendar.DAY_OF_MONTH);
 				//Wenn monat und Tag nicht gleich speichere in neue liste 
 				if(bridgeDayMonth==holiDayMonth && bridgeDayDay==holiDayDay) {
 					dayExist = true;
@@ -166,30 +159,10 @@ public class Holidays {
 		return reworkedBridgingDays;
 	}
 	
-	//ausgabe der Datumsangaben für alle Feiertage während der Woche 
-	private void outputHoliDays(ArrayList<GregorianCalendar> bridgDays,ArrayList<GregorianCalendar> allHolidays,int year) {
-		System.out.println("\nAlle Feiertage "+ year+" während der Woche:\n");
-		for(GregorianCalendar holiDay : allHolidays) {
-			DateFormat df = DateFormat.getDateInstance( DateFormat.FULL );
-			String s = df.format( holiDay.getTime() );
-			int day = holiDay.get(Calendar.DAY_OF_WEEK);
-			if(day>1&&day<7) {
-			System.out.println("Feiertag am: " + s);	
-			}
-		}
-		System.out.println("\nAlle Potentiellen Brückentage "+ year+" während der Woche:\n");
-		for(GregorianCalendar holiDay : bridgDays) {
-			DateFormat df = DateFormat.getDateInstance( DateFormat.FULL );
-			String s = df.format( holiDay.getTime() );
-			System.out.println("Brückentag am: " + s);	
-		}
-	}
 	
 	/**
 	 * @TODO: 
 	 * schreiben in datei überarbeiten : 
-	 *  aussehen(feiertage): 
-	 * Feiertag		tag 	monat	jahr	wochentag 	
 	 * aussehen (brückentage):
 	 * Feiertag 	von		bis 	start wochentag 	ende wochentag 	freie Tage
 	 * @param bridgingDays
@@ -197,20 +170,25 @@ public class Holidays {
 	 * @throws IOException
 	 */
 	//Schreibt die Datumsangaben in eine externe CSV File
-	private void writeIntoFile(ArrayList<GregorianCalendar> bridgingDays, ArrayList<GregorianCalendar> allHoliDays) throws IOException {
-		String verzeichnisDestop = System.getProperty("user.home");
-		Path pfadMitDatei = Paths.get(verzeichnisDestop, "try.csv");
+	private void writeIntoFile(ArrayList<GregorianCalendar> bridgingDays, ArrayList<Holiday> allHoliDays) throws IOException {
+		//wenn nicht nach allen bundesländern gesucht wird 
+		//schreibe nur die einträge des gesuchten bundeslandes in die csv datei
+		if(!allStates) {
+		allHoliDays = selectionOfState(allHoliDays);
+		}
+		Path pfadMitDatei = Paths.get("D:\\develop\\java\\Holidays\\Urlaub.csv");
 			try(BufferedWriter writePuffer = Files.newBufferedWriter(pfadMitDatei)){
 				writePuffer.write("gesetzliche Feiertage");
 				writePuffer.newLine();
 				writePuffer.write("Feiertag;Tag;Monat;Jahr;Wochentag");
 				writePuffer.newLine();
-				for(GregorianCalendar holiDay: allHoliDays) {
-					String weekDay = whichDay(holiDay);
-					int day = holiDay.get(Calendar.DAY_OF_MONTH);
-					String month = whichMonth(holiDay);
-					int year = holiDay.get(Calendar.YEAR);
-					String zeile = String.format("%s;%d;%s;%d%n", weekDay,day,month,year);
+				for(Holiday holiDay: allHoliDays) {
+					String nameOfHoliday = holiDay.name;
+					String weekDay = whichWeekDay(holiDay.cal.get(Calendar.DAY_OF_WEEK));
+					int day = holiDay.cal.get(Calendar.DAY_OF_MONTH);
+					String month = whichMonth(holiDay.cal.get(Calendar.MONTH));
+					int year = holiDay.cal.get(Calendar.YEAR);
+					String zeile = String.format("%s;%d;%s;%d;%s%n", nameOfHoliday,day,month,year,weekDay);
 					writePuffer.write(zeile);
 				}
 				writePuffer.write("Potentielle Brueckentage");
@@ -218,21 +196,30 @@ public class Holidays {
 				writePuffer.write(";Tag;Monat;Jahr;Wochentag");
 				writePuffer.newLine();
 				for(GregorianCalendar bridgeDay: bridgingDays) {
-					String weekDay1 = whichDay(bridgeDay);
+					String weekDay1 = whichWeekDay(bridgeDay.get(Calendar.DAY_OF_WEEK));
 					int day = bridgeDay.get(Calendar.DAY_OF_MONTH);
-					String month = whichMonth(bridgeDay);
+					String month = whichMonth(bridgeDay.get(Calendar.MONTH));
 					int year = bridgeDay.get(Calendar.YEAR);
-					String zeile = String.format("%s;%d;%s;%d,%s%n", " ",day,month,year,weekDay1);
+					String zeile = String.format("%s;%d;%s;%d;%s%n", " ",day,month,year,weekDay1);
 					writePuffer.write(zeile);
-				}
+//				}
 			}
 		}
-		
-	//Gibt den Wochentag als String zurück, ausgehend von day_of_week angabe
-	private String whichDay(GregorianCalendar holiDay) {
-		int numberOfDay = holiDay.get(Calendar.DAY_OF_WEEK);
+	}
+
+	private ArrayList<Holiday> selectionOfState(ArrayList<Holiday> allHoliDays) {
+		ArrayList<Holiday> shadowListHoliDays = new ArrayList<Holiday>();
+		for(Holiday list: allHoliDays) {
+			if(list.stateOF.contains(yourState))
+			shadowListHoliDays.add(list);
+		}
+		return shadowListHoliDays;
+	}
+
+	//Gibt den Wochentag als String zurück,
+	private String whichWeekDay(int numberOfWeekday) {
 		String wochenTag = "";
-		switch (numberOfDay) {
+		switch (numberOfWeekday) {
 		case 1: 
 			wochenTag = "Sonntag";
 			break;
@@ -257,12 +244,12 @@ public class Holidays {
 		}
 		return wochenTag;
 	}
+			
 	
-	//Gibt den Monat als String zurück, ausgehen von month angabe 
-	private String whichMonth(GregorianCalendar holiDay) {
-		int numnberOfMonth = holiDay.get(Calendar.MONTH);
+	//Gibt den Monat als String zurück
+	private String whichMonth(int holiDay) {
 		String month ="";
-		switch(numnberOfMonth) {
+		switch(holiDay) {
 		case 0: 
 			month = "Januar";
 			break;
@@ -310,9 +297,9 @@ public class Holidays {
 	//Gibt eine Liste mit Holiday Elementen wieder (Diese beinhalten: GregorianCalendar, Name sowie die Bundesländer in denen sie vorkommen)
 	private ArrayList<Holiday> allDataForHolidays(ArrayList<GregorianCalendar>allHolidays){
 		int counter =0;
-		String[] nameOfHoliDay = {"Neujahr","Heilige Drei Koenige","Karfreitag","Ostersonntag","Ostermontag","Tag der Arbeit","Christ Himmelfahr","Pfingstsonntag",
-				"PFingsmontag","Fronleichnam","Augsburger FriedensFest","Mariä Himmelfahrt","Tag der Deutschen Einheit","Reformationstag","Allerheiligen",
-				"Buß- und Bettag","1.Weichnachtag","2.Weihnachtstag"};
+		String[] nameOfHoliDay = {"Neujahr","Heilige Drei Koenige","Karfreitag","Ostersonntag","Ostermontag","Tag der Arbeit","Christi Himmelfahrt","Pfingstsonntag",
+				"PFingstmontag","Fronleichnam","Augsburger FriedensFest(Nur in Augsburg!)","Mariae Himmelfahrt","Tag der Deutschen Einheit","Reformationstag","Allerheiligen",
+				"Buss- und Bettag","1.Weichnachtag","2.Weihnachtstag"};
 		String[] statesForHolidaysInGermany = {allStatesOfGermany(),"Baden-Württemberg,Bayern, Sachsen-Anhalt",allStatesOfGermany(),"Brandenburg",allStatesOfGermany(),
 				allStatesOfGermany(),allStatesOfGermany(),"Brandenburg",allStatesOfGermany(),"Baden-Württemberg, Bayern, Hessen, Nordrhein-Westfalen,Rheinland-Pfalz, Saarland",
 				"Bayern","Bayern, Saarland",allStatesOfGermany(),"Brandenburg, Mecklenburg-Vorpomern, Sachsen, Sachsen-Anhalt, Thüringen, Bremen, Hamburg, Schleswig-Holstein, Niedersachsen",
