@@ -36,7 +36,9 @@ public class HoliDaysMain {
 		InputStreamReader state = new InputStreamReader(System.in);
 		BufferedReader br = new BufferedReader(state);
 		String stateToSearch = br.readLine();
-		return stateToSearch;
+		Character firstChar = stateToSearch.charAt(0);
+		
+		return Character.toUpperCase(firstChar)+stateToSearch.substring(1, stateToSearch.length());
 	}
 
 }

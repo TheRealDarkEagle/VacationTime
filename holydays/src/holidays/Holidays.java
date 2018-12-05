@@ -176,31 +176,28 @@ public class Holidays {
 		if(!allStates) {
 		allHoliDays = selectionOfState(allHoliDays);
 		}
-		Path pfadMitDatei = Paths.get("D:\\develop\\java\\Holidays\\Urlaub.csv");
-			try(BufferedWriter writePuffer = Files.newBufferedWriter(pfadMitDatei)){
-				writePuffer.write("gesetzliche Feiertage");
-				writePuffer.newLine();
-				writePuffer.write("Feiertag;Tag;Monat;Jahr;Wochentag");
-				writePuffer.newLine();
+		Path pathToFile = Paths.get("D:\\develop\\java\\Holidays\\Urlaub.csv");
+		try(BufferedWriter writePuffer = Files.newBufferedWriter(pathToFile)){
+				writePuffer.write("\ngesetzliche Feiertage\n\n");
+				writePuffer.write("Wochentag;Tag;Monat;Jahr;Feiertag\n");
 				for(Holiday holiDay: allHoliDays) {
 					String nameOfHoliday = holiDay.name;
 					String weekDay = whichWeekDay(holiDay.cal.get(Calendar.DAY_OF_WEEK));
 					int day = holiDay.cal.get(Calendar.DAY_OF_MONTH);
 					String month = whichMonth(holiDay.cal.get(Calendar.MONTH));
 					int year = holiDay.cal.get(Calendar.YEAR);
-					String zeile = String.format("%s;%d;%s;%d;%s%n", nameOfHoliday,day,month,year,weekDay);
+					String zeile = String.format("%s;%d;%s;%d;%s%n", weekDay,day,month,year,nameOfHoliday);
 					writePuffer.write(zeile);
 				}
-				writePuffer.write("Potentielle Brueckentage");
-				writePuffer.newLine();
-				writePuffer.write(";Tag;Monat;Jahr;Wochentag");
+				writePuffer.write("\nPotentielle Brueckentage\n\n");
+				writePuffer.write("Wochentag;Tag;Monat;Jahr;");
 				writePuffer.newLine();
 				for(GregorianCalendar bridgeDay: bridgingDays) {
 					String weekDay1 = whichWeekDay(bridgeDay.get(Calendar.DAY_OF_WEEK));
 					int day = bridgeDay.get(Calendar.DAY_OF_MONTH);
 					String month = whichMonth(bridgeDay.get(Calendar.MONTH));
 					int year = bridgeDay.get(Calendar.YEAR);
-					String zeile = String.format("%s;%d;%s;%d;%s%n", " ",day,month,year,weekDay1);
+					String zeile = String.format("%s;%d;%s;%d;%s%n", weekDay1,day,month,year," ");
 					writePuffer.write(zeile);
 //				}
 			}
@@ -298,7 +295,7 @@ public class Holidays {
 	private ArrayList<Holiday> allDataForHolidays(ArrayList<GregorianCalendar>allHolidays){
 		int counter =0;
 		String[] nameOfHoliDay = {"Neujahr","Heilige Drei Koenige","Karfreitag","Ostersonntag","Ostermontag","Tag der Arbeit","Christi Himmelfahrt","Pfingstsonntag",
-				"PFingstmontag","Fronleichnam","Augsburger FriedensFest(Nur in Augsburg!)","Mariae Himmelfahrt","Tag der Deutschen Einheit","Reformationstag","Allerheiligen",
+				"Pfingstmontag","Fronleichnam","Augsburger FriedensFest(Nur in Augsburg!)","Mariae Himmelfahrt","Tag der Deutschen Einheit","Reformationstag","Allerheiligen",
 				"Buss- und Bettag","1.Weichnachtag","2.Weihnachtstag"};
 		String[] statesForHolidaysInGermany = {allStatesOfGermany(),"Baden-Württemberg,Bayern, Sachsen-Anhalt",allStatesOfGermany(),"Brandenburg",allStatesOfGermany(),
 				allStatesOfGermany(),allStatesOfGermany(),"Brandenburg",allStatesOfGermany(),"Baden-Württemberg, Bayern, Hessen, Nordrhein-Westfalen,Rheinland-Pfalz, Saarland",
