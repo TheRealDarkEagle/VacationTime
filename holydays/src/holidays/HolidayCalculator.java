@@ -23,7 +23,6 @@ public class HolidayCalculator {
 		if(!stateOf.contains("alle")) {
 			this.state = StateOf.valueOf(stateOf.toLowerCase());
 		}
-		
 	}
 
 	/**
@@ -47,7 +46,6 @@ public class HolidayCalculator {
 		//Erstelle urlaub anhand feiertage 
 		ArrayList<Day>vacation = sortOutOfHolidays(allHoliday);
 		vacation = setVacation(vacation);
-		
 		//Beschreibe CSV Datei
 		try {
 			enterInCsvFile(allHoliday,bridgeDays, vacation);
@@ -56,7 +54,6 @@ public class HolidayCalculator {
 		}
 	}
 	
-	
 	//Setz listeneinträge auf vorherigen Montag bzw nächsten Sonntag
 	private ArrayList<Day> setVacation(ArrayList<Day> vacation) {
 		for(int a=0;a<vacation.size()-1;a+=2) {
@@ -64,7 +61,6 @@ public class HolidayCalculator {
 				if(vacation.get(a).getDayOfMonth()==vacation.get(a).getGc().getActualMinimum(Calendar.DAY_OF_MONTH)) {
 					vacation.get(a).getGc().set(Calendar.MONTH,vacation.get(a).getMonth()-1);
 					vacation.get(a).getGc().set(Calendar.DAY_OF_MONTH, vacation.get(a).getGc().getActualMaximum(Calendar.DAY_OF_MONTH));
-					
 				}
 				vacation.get(a).getGc().roll(Calendar.DAY_OF_MONTH, -1);
 			}
@@ -121,7 +117,6 @@ public class HolidayCalculator {
 				if(temp.getTime().equals(day.getTime())&&!day.isWeekend()){
 					usedVacDays++;
 				}
-				
 			}
 			if(temp.get(Calendar.DAY_OF_WEEK)==1 ||
 			   temp.get(Calendar.DAY_OF_WEEK)==6) {
@@ -137,7 +132,6 @@ public class HolidayCalculator {
 		return usedVacDays;
 	}
 
-	
 	private void writeInFile(ArrayList<Day> list, BufferedWriter bw) throws IOException {
 		for(Day entry:list) {
 			String infos = entry.getCsvEntry().replace(',', ';');
@@ -165,7 +159,6 @@ public class HolidayCalculator {
 		return numberofVacDays;
 	}
 	
-	
 	//Prüft ob die tage nicht weiter als 2KW auseinander liegen -> wenn ja -> fügt beide tage in liste ien 
 	private ArrayList<Day> OutsourceList(ArrayList<Day> vacation) {
 		ArrayList<Day>vacationList = new ArrayList<Day>();
@@ -175,7 +168,6 @@ public class HolidayCalculator {
 				vacationList.add(new Day(new GregorianCalendar(year, vacation.get(a+1).getMonth(), vacation.get(a+1).getDayOfMonth())));
 			}
 		}
-		
 		return vacationList;
 	}
 
@@ -196,7 +188,6 @@ public class HolidayCalculator {
 		for(Day day:allHoliday) {
 			if(day.getDay()==2||day.getDay()==5){
 				tempBridgeDays.add(new Day(false, true, false, new GregorianCalendar(year, day.getMonth(), day.getDayOfMonth()+1), ""));
-				
 			}else if(day.getDay()==3||day.getDay()==6) {
 				tempBridgeDays.add(new Day(false, true, false, new GregorianCalendar(year, day.getMonth(), day.getDayOfMonth()-1), ""));
 			}
@@ -229,7 +220,6 @@ public class HolidayCalculator {
 				end = a;
 				holdHolidays.add(acceptedHolidays.substring(start, end));
 				start = a+2;
-				
 			}
 		}
 		holdHolidays.add(acceptedHolidays.substring(start,acceptedHolidays.length()));
@@ -368,7 +358,6 @@ public class HolidayCalculator {
 		int i = year % 19;
 		int j = year / 100;
 		int k = year % 100;
-		
 		int l = (19 * i + j - (j / 4) - ((j - ((j + 8) / 25) + 1) / 3) + 15) % 30;
 		int m = (32 + 2 * (j % 4) + 2 * (k / 4) - l - (k % 4)) % 7;
 		int n = l + m - 7 * (( i + 11 * l + 22 * m) / 451 ) + 114;
