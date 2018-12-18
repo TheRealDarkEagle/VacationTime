@@ -7,38 +7,23 @@ import java.io.InputStreamReader;
 public class HoliDaysMain {
 
  
-	public static void main(String[] args) throws IOException {
-		boolean allStates = false;
-		System.out.println("Willkommen! für welches Bundesland möchten Sie gerne die Feiertage ausgegeben haben?\nFür alle Bundesländer bitte \"alle\" eingeben:");
-		String whichStateToSelect = callToWrite();
-		allStates = searchAllStates(whichStateToSelect);
-		System.out.println("Fast geschafft... nun bitte noch das Jahr für dessen Sie die Feiertage wissen möchten.");
-		int year = insertYear();
-		new Holidays(allStates, whichStateToSelect).calendar(year);
+	public static void main(String[] args) {
+		System.out.println("Willkommen bei dem neuen FeiertagsKalendar\n Bitte geben Sie Bundesland und Jahr ein.\n Wenn Sie KEINE Selection des Bundeslandes möchten,\n dann geben Sie bitte "
+				+  (char)34+"alle"+(char)34 +" ein:");
+		HolidayCalculator hc = new HolidayCalculator(input().toLowerCase());
+		hc.calendarStart();
+	}
+	private static String input(){
+		InputStreamReader isr = new InputStreamReader(System.in);
+		BufferedReader br = new BufferedReader(isr);
 		
-		System.out.println("Es wurde eine CSV Datei für Sie erstellt.\nPfad: D:\\develop\\java\\Holidays\\Urlaub.csv");
-	}
-	private static int insertYear() throws IOException {
-		String yearAsString = callToWrite();
-		Integer year = Integer.parseInt(yearAsString);
-		return year;
-	}
-	//Setzt bei eingabe von "all" boolean auf true, alle Feiertage für jedes Bundesland werden ausgegeben 
-	private static boolean searchAllStates(String stateToSelectSearch) {
-		if(stateToSelectSearch.equals("alle")) {
-			return true;
+		String eingabe ="";
+		try {
+			eingabe = br.readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Etwas ist schief gelaufen....!");
 		}
-		return false;
+		return eingabe;
 	}
-	
-	//Eingabe des Bundeslandes für die Feiertage, welche man ausgegeben haben möchte
-	private static String callToWrite() throws IOException {
-		InputStreamReader state = new InputStreamReader(System.in);
-		BufferedReader br = new BufferedReader(state);
-		String stateToSearch = br.readLine();
-		Character firstChar = stateToSearch.charAt(0);
-		
-		return Character.toUpperCase(firstChar)+stateToSearch.substring(1, stateToSearch.length());
-	}
-
 }
