@@ -21,7 +21,7 @@ public class HolidayCalculator {
 		this.year =  Integer.valueOf(allInfos.replaceAll("[^0-9]", ""));
 		this.stateOf = allInfos.replaceAll("[^a-z]", "");
 		if(!stateOf.contains("alle")) {
-			this.state = StateOf.valueOf(stateOf.toLowerCase());
+			this.state = StateOf.valueOf(stateOf.toUpperCase());
 		}
 	}
 
@@ -147,7 +147,6 @@ public class HolidayCalculator {
 		GregorianCalendar gStart = new GregorianCalendar(year, start.getMonth(), start.getDayOfMonth());
 		int numberofVacDays =0;
 		do{
-			System.out.println(gStart.getTime());
 			if(gStart.get(Calendar.MONTH)!=end.getGc().get(Calendar.MONTH)) {
 				numberofVacDays = (gStart.getActualMaximum(Calendar.DAY_OF_MONTH)-start.getGc().get(Calendar.DAY_OF_MONTH));
 				gStart.roll(Calendar.MONTH, 1);
@@ -230,68 +229,68 @@ public class HolidayCalculator {
 	private String selectState() {
 		String whichHoliday = "";
 		switch (state) {
-		case badenwürttemberg:
-			state = StateOf.badenwürttemberg;
+		case BADENWÜRTTEMBERG:
+			state = StateOf.BADENWÜRTTEMBERG;
 			whichHoliday = state.getHoliday();
 			break;
-		case bayern:
-			state = StateOf.bayern;
+		case BAYERN:
+			state = StateOf.BAYERN;
 			whichHoliday = state.getHoliday();
 			break;
-		case berlin:
-			state = StateOf.berlin;
+		case BERLIN:
+			state = StateOf.BERLIN;
 			whichHoliday = state.getHoliday();
 			break;
-		case brandenburg:
-			state = StateOf.brandenburg;
+		case BRANDENBURG:
+			state = StateOf.BRANDENBURG;
 			whichHoliday = state.getHoliday();
 			break;
-		case bremen:
-			state = StateOf.bremen;
+		case BREMEN:
+			state = StateOf.BREMEN;
 			whichHoliday = state.getHoliday();
 			break;
-		case hamburg:
-			state = StateOf.hamburg;
+		case HAMBURG:
+			state = StateOf.HAMBURG;
 			whichHoliday = state.getHoliday();
 			break;
-		case hessen:
-			state = StateOf.hessen;
+		case HESSEN:
+			state = StateOf.HESSEN;
 			whichHoliday = state.getHoliday();
 			break;
-		case mecklenburgvorpommern:
-			state = StateOf.mecklenburgvorpommern;
+		case MECKLENBURGVORPOMMERN:
+			state = StateOf.MECKLENBURGVORPOMMERN;
 			whichHoliday = state.getHoliday();
 			break;
-		case niedersachsen:
-			state = StateOf.niedersachsen;
+		case NIEDERSACHSEN:
+			state = StateOf.NIEDERSACHSEN;
 			whichHoliday = state.getHoliday();
 			break;
-		case nordrheinwestfalen:
-			state = StateOf.nordrheinwestfalen;
+		case NORDRHEINWESTFALEN:
+			state = StateOf.NORDRHEINWESTFALEN;
 			whichHoliday = state.getHoliday();
 			break;
-		case rheinlandpfalz:
-			state = StateOf.rheinlandpfalz;
+		case RHEINLANDPFALZ:
+			state = StateOf.RHEINLANDPFALZ;
 			whichHoliday = state.getHoliday();
 			break;
-		case saarland:
-			state = StateOf.saarland;
+		case SAARLAND:
+			state = StateOf.SAARLAND;
 			whichHoliday = state.getHoliday();
 			break;
-		case sachsen:
-			state = StateOf.sachsen;
+		case SACHSEN:
+			state = StateOf.SACHSEN;
 			whichHoliday = state.getHoliday();
 			break;
-		case sachsenanhalt:
-			state = StateOf.sachsenanhalt;
+		case SACHSENANHALT:
+			state = StateOf.SACHSENANHALT;
 			whichHoliday = state.getHoliday();
 			break;
-		case schleswigholstein:
-			state = StateOf.schleswigholstein;
+		case SCHLESWIGHOLSTEIN:
+			state = StateOf.SCHLESWIGHOLSTEIN;
 			whichHoliday = state.getHoliday();
 			break;
-		case thüringen:
-			state = StateOf.thüringen;
+		case THÜRINGEN:
+			state = StateOf.THÜRINGEN;
 			whichHoliday = state.getHoliday();
 			break;
 		default:
