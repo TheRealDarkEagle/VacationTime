@@ -22,7 +22,7 @@ public enum StateOf {
 	private final String holiday;
 	
 	
-	StateOf(String state){
+	private StateOf(String state){
 		holiday = state;
 	}
 	

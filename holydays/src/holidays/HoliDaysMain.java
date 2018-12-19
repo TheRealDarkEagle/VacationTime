@@ -21,7 +21,6 @@ public class HoliDaysMain {
 		try {
 			eingabe = br.readLine();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			System.out.println("Etwas ist schief gelaufen....!");
 		}
 		return eingabe;
